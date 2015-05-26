@@ -1,0 +1,44 @@
+calling gorupme api with id:  138884716194300463
+services.js:63 calling gorupme api with id:  138876754654601254
+services.js:63 calling gorupme api with id:  138823362825622345
+services.js:63 calling gorupme api with id:  138785157591783791
+services.js:63 calling gorupme api with id:  138742351416108995
+services.js:63 calling gorupme api with id:  138621238154124178
+services.js:63 calling gorupme api with id:  138383746652525780
+services.js:63 calling gorupme api with id:  138353272530747845
+services.js:63 calling gorupme api with id:  138353063021213986
+services.js:63 calling gorupme api with id:  137995580632662480
+
+
+first message id = 137590868906337792
+
+
+grab newest message, which will be 42
+grab all messages (limit 3) before 42
+begin addings messages to firebase
+  
+if 
+
+
+
+
+
+
+
+
+
+all messages in group me
+42
+41
+40
+39
+38
+37
+36
+35
+
+
+all messagse in database
+41
+40
+39

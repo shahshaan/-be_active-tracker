@@ -6,13 +6,20 @@ angular.module('myApp.calendar', [])
 
   $scope.addAMessage = function() {
     console.log('in addAMessage in CalendarController');
-    Messages.addAMessage();
+    // Messages.addAMessage();
   };
 
   $scope.storeAllMessages = function() {
-    Messages.storeAllMessages();
+    // Messages.storeAllMessages();
   };
 
+  $scope.allMessages = function() {
+    Messages.allMessages();
+  };
+
+  $scope.addNewestMessagesToFirebase = function() {
+    Messages.addNewestMessagesToFirebase();
+  };
 
   
 

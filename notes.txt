@@ -10,7 +10,8 @@ services.js:63 calling gorupme api with id:  138353063021213986
 services.js:63 calling gorupme api with id:  137995580632662480
 
 
-first message id = 137590868906337792
+first message id = 136906663143273186
+created_at =  Mon May 20 2013 09:17:15 GMT-0700 (PDT)
 
 
 grab newest message, which will be 42

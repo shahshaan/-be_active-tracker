@@ -6,3 +6,15 @@
 <span ng-click="addAMessage()">add a message</span>
 <br>
 <span ng-click="storeAllMessages()">run storeAllMessages</span>
+
+<p>{{ allMessages }} asdf</p>
+
+<div ng-repeat="message in allMessages">
+  <p>{{ message }}</p>
+</div>
+
+
+
+<br>
+
+<span ng-click="addNewestMessagesToFirebase()">run addNewestMessagesToFirebase</span>

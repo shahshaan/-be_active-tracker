@@ -17,7 +17,7 @@ angular.module('myApp.services', [])
             method: 'GET',
             url: 'https://api.groupme.com/v3/groups/4496439/messages?token=ec8ada30e3d90132ed085a146521cb31',
             params: {
-              before_id: '138785157591783791',
+              after_id: '143258757472618245', // after_id with newest message will return an empty array
               limit: 100
             }
           })
@@ -89,15 +89,23 @@ angular.module('myApp.services', [])
           return firstMessageId;
         };
 
-        getFirstMessageId();
-
-        // var addNewestMessagesToFirebase = function() {
-        //   // 
-        // };
+        var addNewestMessagesToFirebase = function() {
+          // grab the 
+        };
 
         return {
             addAMessage: addAMessage,
-            storeAllMessages: storeAllMessages,
-            getFirstMessageId: getFirstMessageId
+            storeAllMessages: storeAllMessages
         }
 });
+
+
+
+
+
+
+
+
+
+
+

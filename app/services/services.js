@@ -1,5 +1,42 @@
 angular.module('myApp.services', [])
 
+.factory('Groupme', function($http) {
+
+  var firebase = new Firebase("https://brilliant-inferno-1190.firebaseio.com/be_active-tracker2");
+
+  var setUsers = function(groupMeId) {
+
+    var url = 'https://api.groupme.com/v3/groups/'
+    url += groupMeId;
+
+    $http({
+      method: 'GET',
+      url: url,
+      params: {
+        token: GROUP_ME_TOKEN
+      }
+    }).then(function(response) {
+      var users = response.data.response.members;
+      addUsersToFirebase(users);
+    });
+
+    var addUsersToFirebase = function(users) {
+      var firebaseUsers = firebase.child("users");
+      var usersObj = {};
+      for (var i = 0; i < users.length; i++) {
+        var user = users[i];
+        usersObj[user['user_id']] = user
+      };
+      console.log(usersObj);
+      firebaseUsers.set(usersObj);
+    };
+
+  }
+
+  return {
+    setUsers: setUsers
+  };
+})
 
 .factory('Messages', function($http){
 
@@ -11,98 +48,6 @@ angular.module('myApp.services', [])
       var currentUtcSeconds = tempDate.setUTCSeconds(utcSeconds);
       return new Date(currentUtcSeconds);
     };
-
-    // var storeAllMessages = function() {
-    //   return $http({
-    //     method: 'GET',
-    //     url: 'https://api.groupme.com/v3/groups/4496439/messages?token=ec8ada30e3d90132ed085a146521cb31',
-    //     params: {
-    //       after_id: '143258757472618245', // after_id with newest message will return an empty array
-    //       limit: 100
-    //     }
-    //   })
-    //   .then(function (resp) {
-    //     var messages = resp.data.response.messages;
-    //     console.log(messages);
-    //   });
-    // };
-
-    // var storeMessages = function(messages) {
-    //   console.log('storing messages');
-    //   firebase.set({
-    //     oldest_message_id: messages[messages.length - 1].id
-    //   });
-    // };
-
-    // var addAMessage = function() {
-    //   console.log('in addAMessage in messages factory', firebase);
-    //   return firebase.push({
-    //     author: "gracehop",
-    //     title: "Announcing COBOL, a New Programming Language"
-    //   });
-    // };
-
-    // var getFirstMessageId = function() {
-
-    //   var firstMessageId = "";
-    //   // call groupme api with limit 100 and get last message id
-    //   // call groupme api with limit 100 with before id as last message id
-    //     // if returns messages array with length <= 100
-    //       // set firebase first message id
-    //     // else
-    //       // recurse, call groupme api with last message id
-    //   var recursiveMessageCaller = function(lastMessageId) {
-    //     $http({
-    //       method: 'GET',
-    //       url: 'https://api.groupme.com/v3/groups/4496439/messages?token=ec8ada30e3d90132ed085a146521cb31',
-    //       params: {
-    //         limit: 100,
-    //         before_id: lastMessageId
-    //       }
-    //     })
-    //     .then(function (resp) {
-    //       var messages = resp.data.response.messages;
-    //       var lastMessageId = messages[messages.length - 1].id;
-    //       if (messages.length === 100) {
-    //         console.log('calling groupme api with id: ', lastMessageId);
-    //         recursiveMessageCaller(lastMessageId)
-    //       } else {
-    //         firstMessageId = lastMessageId;
-    //         console.log('firstMessageId', firstMessageId);
-    //       }              
-    //     });
-    //   };
-
-    //   $http({
-    //     method: 'GET',
-    //     url: 'https://api.groupme.com/v3/groups/4496439/messages?token=ec8ada30e3d90132ed085a146521cb31',
-    //     params: {
-    //       limit: 100
-    //     }
-    //   })
-    //   .then(function (resp) {
-    //     var messages = resp.data.response.messages;
-    //     var lastMessageId = messages[messages.length - 1].id
-    //     recursiveMessageCaller(lastMessageId);
-    //   });
-
-    //   return firstMessageId;
-    // };
-
-    var allMessages = function() {
-      firebase.child('messages').on("value", 
-        function(snapshot) {
-          var allMessages = snapshot.val();
-          console.log(allMessages);
-        }, 
-        function (errorObject) {
-          console.log("The read failed: " + errorObject.code);
-        }
-      );
-
-      return [1,2,3];
-
-    }
 
     var addNewestMessagesToFirebase = function() {
       // grab the latest message id that is on firebase
@@ -182,16 +127,107 @@ angular.module('myApp.services', [])
     
 
     return {
-      addAMessage: "addAMessage",
-      allMessages: allMessages,
-      storeAllMessages: "storeAllMessages",
       addNewestMessagesToFirebase: addNewestMessagesToFirebase
     }
 });
 
+// /groups/:group_id/members/results/:results_id
+
+// https://api.groupme.com/v3/groups/4496439?token=ec8ada30e3d90132ed085a146521cb31
+
+// /groups/:id
+
+// var storeAllMessages = function() {
+//   return $http({
+//     method: 'GET',
+//     url: 'https://api.groupme.com/v3/groups/4496439/messages?token=ec8ada30e3d90132ed085a146521cb31',
+//     params: {
+//       after_id: '143258757472618245', // after_id with newest message will return an empty array
+//       limit: 100
+//     }
+//   })
+//   .then(function (resp) {
+//     var messages = resp.data.response.messages;
+//     console.log(messages);
+//   });
+// };
+
+// var storeMessages = function(messages) {
+//   console.log('storing messages');
+//   firebase.set({
+//     oldest_message_id: messages[messages.length - 1].id
+//   });
+// };
+
+// var addAMessage = function() {
+//   console.log('in addAMessage in messages factory', firebase);
+//   return firebase.push({
+//     author: "gracehop",
+//     title: "Announcing COBOL, a New Programming Language"
+//   });
+// };
+
+// var getFirstMessageId = function() {
+
+//   var firstMessageId = "";
+//   // call groupme api with limit 100 and get last message id
+//   // call groupme api with limit 100 with before id as last message id
+//     // if returns messages array with length <= 100
+//       // set firebase first message id
+//     // else
+//       // recurse, call groupme api with last message id
+//   var recursiveMessageCaller = function(lastMessageId) {
+//     $http({
+//       method: 'GET',
+//       url: 'https://api.groupme.com/v3/groups/4496439/messages?token=ec8ada30e3d90132ed085a146521cb31',
+//       params: {
+//         limit: 100,
+//         before_id: lastMessageId
+//       }
+//     })
+//     .then(function (resp) {
+//       var messages = resp.data.response.messages;
+//       var lastMessageId = messages[messages.length - 1].id;
+//       if (messages.length === 100) {
+//         console.log('calling groupme api with id: ', lastMessageId);
+//         recursiveMessageCaller(lastMessageId)
+//       } else {
+//         firstMessageId = lastMessageId;
+//         console.log('firstMessageId', firstMessageId);
+//       }              
+//     });
+//   };
+
+//   $http({
+//     method: 'GET',
+//     url: 'https://api.groupme.com/v3/groups/4496439/messages?token=ec8ada30e3d90132ed085a146521cb31',
+//     params: {
+//       limit: 100
+//     }
+//   })
+//   .then(function (resp) {
+//     var messages = resp.data.response.messages;
+//     var lastMessageId = messages[messages.length - 1].id
+//     recursiveMessageCaller(lastMessageId);
+//   });
+
+//   return firstMessageId;
+// };
 
 
+// var allMessages = function() {
+//   firebase.child('messages').on("value", 
+//     function(snapshot) {
+//       var allMessages = snapshot.val();
+//       console.log(allMessages);
+//     }, 
+//     function (errorObject) {
+//       console.log("The read failed: " + errorObject.code);
+//     }
+//   );
 
+//   return [1,2,3];
 
+// }
 
 

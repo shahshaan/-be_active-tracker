@@ -5,6 +5,7 @@ var app = angular.module('myApp', [
   'ngRoute',
   'myApp.services',
   'myApp.calendar',
+  'myApp.admin',
   'firebase'
 ]).
 
@@ -16,9 +17,13 @@ config(['$routeProvider', function($routeProvider) {
       controller: 'CalendarController'
   })
 
+  .when('/admin', {
+    templateUrl: 'admin/admin.html',
+    controller: 'AdminController'
+  })
+  
   .otherwise({redirectTo: '/calendar'});
 }]);
-
 
 
 app.directive("calendar", function() {

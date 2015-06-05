@@ -3,8 +3,6 @@ angular.module('myApp.calendar', [])
 .controller('CalendarController', function($scope, Messages, $firebaseArray) {
 
 
-
-
   $scope.addNewestMessagesToFirebase = function() {
     Messages.addNewestMessagesToFirebase();
   };
@@ -15,8 +13,6 @@ angular.module('myApp.calendar', [])
     var ref = new Firebase("https://brilliant-inferno-1190.firebaseio.com/messages-test2/messages");
     $scope.messages = $firebaseArray(ref.orderByChild("created_at").startAt(startOfDay).endAt(endOfDay));
   }
-
-
 
   $scope.day = moment();
 

@@ -20,20 +20,13 @@
   End of this day: {{ endOfDay(startOfDay(day)) }} {{ toMomentFormat(endOfDay(startOfDay(day)))}}
 </p>
 
-<br>
-<div>
-  <h3>All Messages from "allMessages":</h3>
-  <p>{{ allMessages() }}</p>
-  <div ng-repeat="message in allMessages()">
-    <p>{{ message }}</p>
-  </div>
-</div>
-<br>
+
 
 <div>
   <h3>All Messages:</h3>
   <div ng-repeat="message in messages">
     <p>{{ message.name}} ({{ message.created_at }}) - {{ message.text }}</p>
+    <p>{{ message }}</p>
   </div>
 
   <br>

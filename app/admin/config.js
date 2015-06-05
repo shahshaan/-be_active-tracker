@@ -1,0 +1,2 @@
+window.GROUP_ME_TOKEN = 'ec8ada30e3d90132ed085a146521cb31';
+

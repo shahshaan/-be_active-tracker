@@ -10,9 +10,17 @@ angular.module('myApp.calendar', [])
   $scope.filterMessages = function(time) {
     var startOfDay = $scope.startOfDay(time);
     var endOfDay = $scope.endOfDay(startOfDay);
-    var ref = new Firebase("https://brilliant-inferno-1190.firebaseio.com/messages-test2/messages");
-    $scope.messages = $firebaseArray(ref.orderByChild("created_at").startAt(startOfDay).endAt(endOfDay));
-  }
+    var ref = new Firebase(FIREBASE_DB);
+    $scope.messages = $firebaseArray(ref.child('messages').orderByChild("created_at").startAt(startOfDay).endAt(endOfDay));
+  };
+
+  $scope.filterWorkouts = function(time) {
+    var startOfDay = $scope.startOfDay(time);
+    console.log(startOfDay);
+    var ref = new Firebase(FIREBASE_DB);
+    $scope.workouts = $firebaseArray(ref.child('workouts').child(startOfDay));
+  };
+
 
   $scope.day = moment();
 

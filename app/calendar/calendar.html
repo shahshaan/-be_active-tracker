@@ -6,7 +6,7 @@
 <p ng-click="filterMessages()">run filterMessages</p>
 <br>
 
-<div ng-click="filterMessages(day)">
+<div ng-click="filterMessages(day); filterWorkouts(day)">
   <calendar selected="day"></calendar>
   Selected day: {{ day.format('dddd, MMMM Do YYYY, h:mm:ss a') }}
 </div>
@@ -21,12 +21,19 @@
 </p>
 
 
-
+<div>
+  <h3>Workouts</h3>
+  <div ng-repeat="workoutObj in workouts">
+    {{ workoutObj }}
+    <div ng-repeat="(key, workout) in workoutObj">
+      {{ workout.name}}: {{ workout.text }}
+    </div>
+  </div>
+</div>
 <div>
   <h3>All Messages:</h3>
   <div ng-repeat="message in messages">
-    <p>{{ message.name}} ({{ message.created_at }}) - {{ message.text }}</p>
-    <p>{{ message }}</p>
+    <p>{{ message.name }} ({{ message.created_at }}) - {{ message.text }}</p>
   </div>
 
   <br>

@@ -162,6 +162,20 @@ angular.module('myApp.services', [])
   };
 })
 
+.factory('Workouts', function() {
+
+  var firebase = new Firebase(FIREBASE_DB);
+  
+  var clearWorkouts = function() {
+    var firebaseWorkouts = firebase.child("workouts");
+    firebaseWorkouts.set({});
+  };
+
+  return {
+    clearWorkouts: clearWorkouts
+  }
+})
+
 .factory('Messages', function($http){
 
   var firebase = new Firebase("https://brilliant-inferno-1190.firebaseio.com/messages-test2");

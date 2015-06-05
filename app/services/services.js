@@ -1,6 +1,6 @@
 angular.module('myApp.services', [])
 
-.factory('Groupme', function($http) {
+.factory('Groupme', function($http, Workouts) {
 
   var firebase = new Firebase(FIREBASE_DB);
   var groupMeApi = 'https://api.groupme.com/v3/groups/' + GROUP_ME_GROUP_ID;
@@ -113,26 +113,6 @@ angular.module('myApp.services', [])
       );
     };
 
-    var isWorkout = function(message) {
-      var loggingTypes = ['#log', '$$', '#L'];
-      var hasLogger = false;
-      for (var i = 0; i < loggingTypes.length; i++) {
-        var logType = loggingTypes[i];
-        if (message.text.indexOf(logType) > -1) {
-          hasLogger = true;
-          break;
-        };
-      };
-      return hasLogger;
-    };
-
-    var addWorkout = function(message) {
-      var timeStamp = parseInt(message.created_at);
-      var startOfDay = timeStamp - (timeStamp % 86400);
-      var firebaseWorkoutDay = firebase.child("workouts").child(startOfDay);
-      firebaseWorkoutDay.push(message);
-    }
-
     var addMessagesToFirebase = function(messages) {
       if (messages.length > 0) {
         var firebaseMessages = firebase.child("messages");
@@ -140,8 +120,8 @@ angular.module('myApp.services', [])
         for (var i = 0; i < messagesLength; i++) {
           var message = messages[i];
           firebaseMessages.push(message);
-          if (message.text && isWorkout(message)) {
-            addWorkout(message);
+          if (message.text && Workouts.isWorkout(message)) {
+            Workouts.addWorkout(message.text);
           };
           if (i === (messagesLength - 1)) {
             var firebaseNewestMessageId = firebase.child("newest_message_id");
@@ -162,7 +142,7 @@ angular.module('myApp.services', [])
   };
 })
 
-.factory('Workouts', function() {
+.factory('Workouts', function($firebaseArray) {
 
   var firebase = new Firebase(FIREBASE_DB);
   
@@ -171,8 +151,57 @@ angular.module('myApp.services', [])
     firebaseWorkouts.set({});
   };
 
+  // TODO: convert the time to central time zone instead of UTC, subtract utc by 5 hours to make it CST
+  var addWorkout = function(message) {
+    var timeStamp = parseInt(message.created_at);
+    var day = moment.unix(timeStamp).utc().format('L');
+    var firebaseWorkoutDay = firebase.child("workouts").child(day);
+    firebaseWorkoutDay.push(message);
+  };
+
+  var isWorkout = function(messageText) {
+    var loggingTypes = ['#log', '$$', '#L'];
+    var hasLogger = false;
+    if (messageText) {
+      for (var i = 0; i < loggingTypes.length; i++) {
+        var logType = loggingTypes[i];
+        if (messageText.indexOf(logType) > -1) {
+          hasLogger = true;
+          break;
+        };
+      };
+    };
+    return hasLogger;
+  };
+
+  var createWorkoutsFromAllMessagesInFirebase = function() {
+
+    firebase.child('messages').once('value', 
+      function(data) {
+        var messagesInFirebase = data.val();
+        console.log('messagesInFirebase', messagesInFirebase);
+
+        for (var key in messagesInFirebase) {
+          var message = messagesInFirebase[key];
+          console.log('Message being checked', message);
+          if (isWorkout(message.text)) {
+            addWorkout(message);
+          };
+        }
+      }, 
+      function (errorObject) {
+        console.log("The read failed: " + errorObject.code);
+      }
+    );
+
+
+  }
+
   return {
-    clearWorkouts: clearWorkouts
+    clearWorkouts: clearWorkouts,
+    createWorkoutsFromAllMessagesInFirebase: createWorkoutsFromAllMessagesInFirebase,
+    addWorkout: addWorkout,
+    isWorkout: isWorkout
   }
 })
 
@@ -259,10 +288,7 @@ angular.module('myApp.services', [])
       }
 
       newestMessageIdOnFirebase(getMessagesFromGroupMe);
-    };
-
-    console.log('going to call addNewestMessagesToFirebase');
-    
+    };    
 
     return {
       addNewestMessagesToFirebase: addNewestMessagesToFirebase

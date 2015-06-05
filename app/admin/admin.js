@@ -20,6 +20,10 @@ angular.module('myApp.admin', [])
 
   $scope.clearWorkouts = function() {
     Workouts.clearWorkouts();
+  };
+
+  $scope.createWorkoutsFromAllMessagesInFirebase = function() {
+    Workouts.createWorkoutsFromAllMessagesInFirebase();
   }
 
 

@@ -20,7 +20,8 @@ angular.module('myApp.admin', [])
   // show users table
 
   $scope.setUsersAndFindFirstMessageId = function() {
-    Groupme.setUsers($scope.groupMeId);
+    Groupme.setUsers();
+    Groupme.findFirstMessageId();
   }
 
 

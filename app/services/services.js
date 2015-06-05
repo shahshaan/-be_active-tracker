@@ -3,15 +3,14 @@ angular.module('myApp.services', [])
 .factory('Groupme', function($http) {
 
   var firebase = new Firebase("https://brilliant-inferno-1190.firebaseio.com/be_active-tracker2");
+  var groupMeApi = 'https://api.groupme.com/v3/groups/' + GROUP_ME_GROUP_ID;
 
-  var setUsers = function(groupMeId) {
+  var setUsers = function() {
 
-    var url = 'https://api.groupme.com/v3/groups/'
-    url += groupMeId;
-
+    // get users from GroupMe group
     $http({
       method: 'GET',
-      url: url,
+      url: groupMeApi,
       params: {
         token: GROUP_ME_TOKEN
       }
@@ -30,11 +29,53 @@ angular.module('myApp.services', [])
       console.log(usersObj);
       firebaseUsers.set(usersObj);
     };
+  }
 
+  var findFirstMessageId = function(groupMeId) {
+    var firstMessageId = '';
+    var groupMeApiMessages = groupMeApi + '/messages'
+    var recursiveMessageCaller = function(lastMessageId) {
+      $http({
+        method: 'GET',
+        url: groupMeApiMessages,
+        params: {
+          limit: 100,
+          before_id: lastMessageId,
+          token: GROUP_ME_TOKEN
+        }
+      })
+      .then(function (resp) {
+        var messages = resp.data.response.messages;
+        var lastMessageId = messages[messages.length - 1].id;
+        if (messages.length === 100) {
+          recursiveMessageCaller(lastMessageId)
+        } else {
+          firstMessageId = lastMessageId;
+          var firebaseNewestMessageId = firebase.child('newest_message_id');
+          firebaseNewestMessageId.set(firstMessageId);
+          console.log('firstMessageId', firstMessageId);
+        }              
+      });
+    };
+
+    $http({
+      method: 'GET',
+      url: groupMeApiMessages,
+      params: {
+        limit: 100,
+        token: GROUP_ME_TOKEN
+      }
+    })
+    .then(function (resp) {
+      var messages = resp.data.response.messages;
+      var lastMessageId = messages[messages.length - 1].id
+      recursiveMessageCaller(lastMessageId);
+    });
   }
 
   return {
-    setUsers: setUsers
+    setUsers: setUsers,
+    findFirstMessageId: findFirstMessageId
   };
 })
 

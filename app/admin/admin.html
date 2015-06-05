@@ -1,11 +1,9 @@
 <h3>Admin</h3>
 
-<ul>
-  <li> <a href="" ng-click="filterMessages()">do something</a></li>
-</ul>
-
-
 <form novalidate ng-submit="setUsersAndFindFirstMessageId()">
-  <div><input type="text" ng-model="groupMeId" /></div>
-  <input type="submit" value="submit" />
+  <input type="submit" value="create users and set first message id" />
+</form>
+
+<form novalidate ng-submit="addNewestGroupMeMessagesToFirebase()">
+  <input type="submit" value="add newest groupme messages to firebase" />
 </form>

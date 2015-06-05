@@ -2,8 +2,9 @@ angular.module('myApp.services', [])
 
 .factory('Groupme', function($http) {
 
-  var firebase = new Firebase("https://brilliant-inferno-1190.firebaseio.com/be_active-tracker2");
+  var firebase = new Firebase(FIREBASE_DB);
   var groupMeApi = 'https://api.groupme.com/v3/groups/' + GROUP_ME_GROUP_ID;
+  var groupMeMessagesApi = groupMeApi + '/messages';
 
   var setUsers = function() {
 
@@ -31,7 +32,7 @@ angular.module('myApp.services', [])
     };
   }
 
-  var findFirstMessageId = function(groupMeId) {
+  var findFirstMessageId = function() {
     var firstMessageId = '';
     var groupMeApiMessages = groupMeApi + '/messages'
     var recursiveMessageCaller = function(lastMessageId) {
@@ -73,9 +74,91 @@ angular.module('myApp.services', [])
     });
   }
 
+  var utcToDate = function(utcSeconds) {
+    var tempDate = new Date(0);
+    var currentUtcSeconds = tempDate.setUTCSeconds(utcSeconds);
+    return new Date(currentUtcSeconds);
+  };
+
+  var addNewestGroupMeMessagesToFirebase = function() {
+
+    var newestMessageIdOnFirebase = function(callback) {
+      console.log('looking for newest message id');
+      firebase.child('newest_message_id').once("value", 
+        function(snapshot) {
+          var newest_message_id = snapshot.val();
+          console.log('newest_message_id: ', newest_message_id)
+          getMessagesFromGroupMe(newest_message_id);
+        }, 
+        function (errorObject) {
+          console.log("The read failed: " + errorObject.code);
+        }
+      );
+    };
+
+    var getMessagesFromGroupMe = function(afterId) {
+      $http({
+        method: 'GET',
+        url: groupMeMessagesApi,
+        params: {
+          after_id: afterId,
+          limit: 100,
+          token: GROUP_ME_TOKEN
+        }
+      })
+      .then(function (resp) {
+        var messages = resp.data.response.messages;
+        addMessagesToFirebase(messages);
+        }
+      );
+    };
+
+    var isWorkout = function(message) {
+      var loggingTypes = ['#log', '$$', '#L'];
+      var hasLogger = false;
+      for (var i = 0; i < loggingTypes.length; i++) {
+        var logType = loggingTypes[i];
+        if (message.text.indexOf(logType) > -1) {
+          hasLogger = true;
+          break;
+        };
+      };
+      return hasLogger;
+    };
+
+    var addWorkout = function(message) {
+      var timeStamp = parseInt(message.created_at);
+      var startOfDay = timeStamp - (timeStamp % 86400);
+      var firebaseWorkoutDay = firebase.child("workouts").child(startOfDay);
+      firebaseWorkoutDay.push(message);
+    }
+
+    var addMessagesToFirebase = function(messages) {
+      if (messages.length > 0) {
+        var firebaseMessages = firebase.child("messages");
+        var messagesLength = messages.length;
+        for (var i = 0; i < messagesLength; i++) {
+          var message = messages[i];
+          firebaseMessages.push(message);
+          if (message.text && isWorkout(message)) {
+            addWorkout(message);
+          };
+          if (i === (messagesLength - 1)) {
+            var firebaseNewestMessageId = firebase.child("newest_message_id");
+            firebaseNewestMessageId.set(messages[messages.length - 1].id, function() { // set latest message id
+              addNewestGroupMeMessagesToFirebase();
+            });
+          };
+        };
+      } 
+    }
+    newestMessageIdOnFirebase();
+  };
+
   return {
     setUsers: setUsers,
-    findFirstMessageId: findFirstMessageId
+    findFirstMessageId: findFirstMessageId,
+    addNewestGroupMeMessagesToFirebase: addNewestGroupMeMessagesToFirebase
   };
 })
 

@@ -29,7 +29,7 @@ config(['$routeProvider', function($routeProvider) {
 app.directive("calendar", function() {
     return {
         restrict: "E",
-        templateUrl: "templates/calendar.html",
+        templateUrl: "services/calendar.html",
         scope: {
             selected: "="
         },

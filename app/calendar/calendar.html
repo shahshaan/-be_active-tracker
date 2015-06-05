@@ -2,19 +2,40 @@
 
 
 <p>This is the partial for the calendar {{ greeting }}</p>
-
-<span ng-click="addAMessage()">add a message</span>
+<span ng-click="addNewestMessagesToFirebase()">run addNewestMessagesToFirebase</span>
+<p ng-click="filterMessages()">run filterMessages</p>
 <br>
-<span ng-click="storeAllMessages()">run storeAllMessages</span>
 
-<p>{{ allMessages }} asdf</p>
-
-<div ng-repeat="message in allMessages">
-  <p>{{ message }}</p>
+<div ng-click="filterMessages(day)">
+  <calendar selected="day"></calendar>
+  Selected day: {{ day.format('dddd, MMMM Do YYYY, h:mm:ss a') }}
 </div>
 
 
+<p>
+  Start of this day: {{ startOfDay(day) }} {{ toMomentFormat(startOfDay(day))}}
+</p>
+
+<p>
+  End of this day: {{ endOfDay(startOfDay(day)) }} {{ toMomentFormat(endOfDay(startOfDay(day)))}}
+</p>
 
 <br>
+<div>
+  <h3>All Messages from "allMessages":</h3>
+  <p>{{ allMessages() }}</p>
+  <div ng-repeat="message in allMessages()">
+    <p>{{ message }}</p>
+  </div>
+</div>
+<br>
 
-<span ng-click="addNewestMessagesToFirebase()">run addNewestMessagesToFirebase</span>
+<div>
+  <h3>All Messages:</h3>
+  <div ng-repeat="message in messages">
+    <p>{{ message.name}} ({{ message.created_at }}) - {{ message.text }}</p>
+  </div>
+
+  <br>
+</div>
+

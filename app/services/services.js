@@ -92,13 +92,16 @@ angular.module('myApp.services', [])
     var allMessages = function() {
       firebase.child('messages').on("value", 
         function(snapshot) {
-          allMessages = snapshot.val();
-          return allMessages;
+          var allMessages = snapshot.val();
+          console.log(allMessages);
         }, 
         function (errorObject) {
           console.log("The read failed: " + errorObject.code);
         }
       );
+
+      return [1,2,3];
+
     }
 
     var addNewestMessagesToFirebase = function() {
@@ -180,15 +183,11 @@ angular.module('myApp.services', [])
 
     return {
       addAMessage: "addAMessage",
-      allMessages: "allMessages",
+      allMessages: allMessages,
       storeAllMessages: "storeAllMessages",
       addNewestMessagesToFirebase: addNewestMessagesToFirebase
     }
 });
-
-
-
-
 
 
 
